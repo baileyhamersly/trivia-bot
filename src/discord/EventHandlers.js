@@ -1,5 +1,5 @@
 //discord client event handling
-import { discordClient } from "ClientConfig.js";
+import { discordClient } from "./discord/ClientConfig";
 import { getTrivia } from "./trivia";
 import { similarity } from "./util";
 import { codeBlock } from "discord.js";
