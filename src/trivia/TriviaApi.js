@@ -1,5 +1,5 @@
 //trivia api
-export const getTrivia = async () => {
+exports.getTrivia = async () => {
     console.log("resetting trivia");
     trivia = {};
     fetch(`https://the-trivia-api.com/v2/questions/`)

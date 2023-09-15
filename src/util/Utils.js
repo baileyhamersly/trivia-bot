@@ -1,5 +1,5 @@
 //util functions
-export const similarity = (s1, s2) => {
+exports.similarity = (s1, s2) => {
     if (s1 && s2) {
         var longer = s1;
         var shorter = s2;
@@ -17,7 +17,7 @@ export const similarity = (s1, s2) => {
     }
   };
 
-export const editDistance = (s1, s2) => {
+exports.editDistance = (s1, s2) => {
     s1 = s1.toLowerCase();
     s2 = s2.toLowerCase();
 

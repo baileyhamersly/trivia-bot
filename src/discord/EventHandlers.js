@@ -1,8 +1,8 @@
 //discord client event handling
-import { discordClient } from "./discord/ClientConfig";
-import { getTrivia } from "./trivia";
-import { similarity } from "./util";
-import { codeBlock } from "discord.js";
+const { discordClient } = require("./ClientConfig");
+const { getTrivia } = require("../trivia/triviaApi");
+const { similarity } = require("../util/Utils");
+const { codeBlock } = require("discord.js");
 
 let trivia = {};
 let triviaCalled = false;

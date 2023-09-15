@@ -1,8 +1,8 @@
 //discord bot client config
-import { Client, IntentsBitField } from "discord.js";
-const { token } = require('./config.json');
+const { Client, IntentsBitField } = require("discord.js");
+const { token } = require('../../config.json');
 
-export const discordClient = new Client({
+exports.discordClient = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMessages,
@@ -12,4 +12,4 @@ export const discordClient = new Client({
   ],
 });
 
-export const discordToken = token;
+exports.discordToken = token;
