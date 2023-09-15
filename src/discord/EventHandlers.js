@@ -1,6 +1,6 @@
 //discord client event handling
 const { discordClient } = require("./ClientConfig");
-const { getTrivia } = require("../trivia/triviaApi");
+//const { getTrivia } = require("../trivia/triviaApi");
 const { similarity } = require("../util/Utils");
 const { codeBlock } = require("discord.js");
 
@@ -15,7 +15,7 @@ discordClient.on("ready", (c) => {
 discordClient.on("messageCreate", async (message) => {
     if (similarity("Trivia Please", message.content) >= 0.8) {
         if (!triviaCalled) {
-            await getTrivia().then(() => {
+              await getTrivia().then(() => {
                 setTimeout(function () {
                   if (trivia?.question) {
                     triviaCalled = true;
@@ -39,3 +39,18 @@ discordClient.on("messageCreate", async (message) => {
         }
     }
 });
+
+//TODO: put this in its own file: TriviaApi.js
+const getTrivia = async () => {
+  console.log("resetting trivia");
+  trivia = {};
+  fetch(`https://the-trivia-api.com/v2/questions/`)
+      .then((response) => response.json())
+      .then((data) => {
+      trivia.question = data[0].question.text;
+      trivia.answer = data[0].correctAnswer;
+      })
+      .catch((error) => {
+      console.log("Error message: ", error);
+      });
+};
