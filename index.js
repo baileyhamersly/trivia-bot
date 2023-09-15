@@ -1,8 +1,5 @@
-import dotenv from "dotenv";
-
-import { Client, IntentsBitField, codeBlock } from "discord.js";
-
-dotenv.config();
+const { Client, IntentsBitField, codeBlock } = require('discord.js');
+const { token } = require('./config.json');
 
 const client = new Client({
   intents: [
@@ -14,7 +11,7 @@ const client = new Client({
   ],
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(token);
 
 client.on("ready", (c) => {
   console.log(`${c.user.username} is online`);
