@@ -1,6 +1,7 @@
 //discord bot client config
 const { Client, IntentsBitField } = require("discord.js");
-const { token } = require('../../config.json');
+const dotenv = require('dotenv');
+dotenv.config();
 
 exports.discordClient = new Client({
   intents: [
@@ -12,4 +13,4 @@ exports.discordClient = new Client({
   ],
 });
 
-exports.discordToken = token;
+exports.discordToken = dotenv.DISCORD_TOKEN;
