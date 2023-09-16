@@ -3,6 +3,13 @@ const { discordClient } = require("./ClientConfig");
 const { getTrivia } = require("../trivia/TriviaApi");
 const { similarity } = require("../util/Utils");
 const { codeBlock } = require("discord.js");
+const {
+  ANSWER_PLEASE,
+  SOMETHING_WENT_WRONG,
+  ERROR_FETCHING_DATA,
+  CORRECT,
+  GOOD_TRY,
+} = require("../util/Constants");
 
 let trivia = {};
 
@@ -12,31 +19,26 @@ discordClient.on("ready", (c) => {
 });
 
 discordClient.on("messageCreate", async (message) => {
-    if (similarity("Trivia Please", message.content) >= 0.8) {
-      try {
-        const triviaData = await getTrivia();
-        if (triviaData) {
-          message.reply(
-            triviaData.question + "\n" +
-              codeBlock("To get the answer, say 'Answer Please', to get a new question say 'Trivia Please'")
-          );
-          trivia.answer = triviaData.answer;
-          trivia.question = triviaData.question;
-        } else {
-          message.reply(
-            "Something has gone wrong with the connection with the trivia API. :( Tell Bailey to get off Baldur's Gate and fix it."
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching trivia:", error);
-        message.reply("An error occurred while fetching trivia data.");
+  if (similarity("Trivia Please", message.content) >= 0.8) {
+    try {
+      const triviaData = await getTrivia();
+      if (triviaData) {
+        message.reply(triviaData.question + "\n" + codeBlock(ANSWER_PLEASE));
+        trivia.answer = triviaData.answer;
+        trivia.question = triviaData.question;
+      } else {
+        message.reply(SOMETHING_WENT_WRONG);
       }
-    } else {
-        if (similarity(message.content, trivia.answer) >= 0.8) {
-          message.reply("That's Right! The answer was '" + trivia.answer + "'");
-        }
-        if (similarity(message.content, "Answer Please")>= 0.8) {
-            message.reply("You tried your best and that's what really counts. The answer was '" + trivia.answer + "'");
-        }
+    } catch (error) {
+      console.error("Error fetching trivia:", error);
+      message.reply(ERROR_FETCHING_DATA);
     }
+  } else {
+    if (similarity(message.content, trivia.answer) >= 0.8) {
+      message.reply(CORRECT + trivia.answer + "'");
+    }
+    if (similarity(message.content, "Answer Please") >= 0.8) {
+      message.reply(GOOD_TRY + trivia.answer + "'");
+    }
+  }
 });
