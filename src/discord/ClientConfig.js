@@ -1,6 +1,6 @@
 //discord bot client config
 const { Client, IntentsBitField } = require("discord.js");
-const { token } = require('../../config.json');
+const { token } = require("../../config.json");
 
 exports.discordClient = new Client({
   intents: [
