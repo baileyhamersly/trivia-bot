@@ -23,22 +23,60 @@ discordClient.on("messageCreate", async (message) => {
     try {
       const triviaData = await getTrivia();
       if (triviaData) {
-        message.reply(triviaData.question + "\n" + codeBlock(ANSWER_PLEASE));
+        message.reply(
+          triviaData.question +
+            "\n" +
+            codeBlock(
+              "To get the answer, say 'Answer Please', to get a new question say 'Trivia Please'"
+            )
+        );
         trivia.answer = triviaData.answer;
         trivia.question = triviaData.question;
+        trivia.choices = triviaData.choices;
+        trivia.difficulty = triviaData.difficulty;
       } else {
-        message.reply(SOMETHING_WENT_WRONG);
+        message.reply(
+          "Something has gone wrong with the connection with the trivia API. :( Tell Bailey to get off Baldur's Gate and fix it."
+        );
       }
     } catch (error) {
       console.error("Error fetching trivia:", error);
-      message.reply(ERROR_FETCHING_DATA);
+      message.reply("An error occurred while fetching trivia data.");
     }
   } else {
     if (similarity(message.content, trivia.answer) >= 0.8) {
-      message.reply(CORRECT + trivia.answer + "'");
+      message.reply("That's Right! The answer was '" + trivia.answer + "'");
+      console.log("resetting trivia");
+      trivia = {};
     }
     if (similarity(message.content, "Answer Please") >= 0.8) {
-      message.reply(GOOD_TRY + trivia.answer + "'");
+      message.reply(
+        "You tried your best and that's what really counts. The answer was '" +
+          trivia.answer +
+          "'"
+      );
+    }
+    if (similarity("Please Help", message.content) >= 0.8) {
+      if (
+        trivia.choices &&
+        ("hard" === trivia.difficulty || "medium" === trivia.difficulty)
+      ) {
+        message.reply(
+          "Fine, I'll make it a bit easier. How about multiple choice?" +
+            "\nA: " +
+            trivia.choices[0] +
+            "\nB: " +
+            trivia.choices[1] +
+            "\nC: " +
+            trivia.choices[2] +
+            "\nD: " +
+            trivia.answer
+        );
+      } else {
+        message.reply(
+          "https://tenor.com/view/hal9000-hal-2001-a-space-odyssey-2001a-space-odyssey-gif-21408319"
+        );
+      }
     }
   }
 });
