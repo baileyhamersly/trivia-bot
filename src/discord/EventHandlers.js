@@ -9,6 +9,13 @@ const {
   ERROR_FETCHING_DATA,
   CORRECT,
   GOOD_TRY,
+  GOOD_TRY_JEFF,
+  JEFF,
+  PAUL_RUDD_GIF,
+  HAL_9000_GIF,
+  MULTIPLE_CHOICE,
+  DIFFICULTY,
+  WHICH_OF_THESE,
 } = require("../util/Constants");
 
 let trivia = {};
@@ -24,75 +31,79 @@ discordClient.on("messageCreate", async (message) => {
     try {
       const triviaData = await getTrivia();
       if (triviaData) {
-        message.reply(
-          triviaData.question +
-            "\n" +
-            codeBlock(
-              "To get the answer, say 'Answer Please', to get a new question say 'Trivia Please'"
-            )
-        );
+        if (triviaData.question.includes(WHICH_OF_THESE)) {
+          message.reply(
+            triviaData.question +
+              "\n" +
+              displayMultipleChoice() +
+              codeBlock(ANSWER_PLEASE)
+          );
+        } else {
+          message.reply(triviaData.question + "\n" + codeBlock(ANSWER_PLEASE));
+        }
         trivia.answer = triviaData.answer;
         trivia.question = triviaData.question;
         trivia.choices = triviaData.choices;
         trivia.difficulty = triviaData.difficulty;
         triviaCalled = true;
       } else {
-        message.reply(
-          "Something has gone wrong with the connection with the trivia API. :( Tell Bailey to get off Baldur's Gate and fix it."
-        );
+        message.reply(SOMETHING_WENT_WRONG);
       }
     } catch (error) {
-      console.error("Error fetching trivia:", error);
-      message.reply("An error occurred while fetching trivia data.");
+      console.error(ERROR_FETCHING_DATA, error);
+      message.reply(ERROR_FETCHING_DATA);
     }
   } else {
     if (similarity(message.content, trivia.answer) >= 0.8) {
-      message.reply("That's Right! The answer was '" + trivia.answer + "'");
-      console.log("resetting trivia");
-      trivia = {};
+      message.reply(CORRECT + trivia.answer + "'");
+      resetTrivia();
     }
     if (similarity(message.content, "Answer Please") >= 0.8 && triviaCalled) {
-      // make this part of the const file.
-      const jeffReply =
-        "https://tenor.com/view/paul-rudd-knockedup-gay-coldplay-insult-gif-12701756";
-      if (message.author.globalName === "Jeff SPR" && percentOdds(25)) {
-        message.reply(jeffReply);
+      if (message.author.globalName === JEFF && percentOdds(25)) {
+        message.reply(PAUL_RUDD_GIF);
         setTimeout(function () {
-          message.reply(
-            "HAHA Just kidding Jeff!!! You tried your best and that's what really counts. The answer was '" +
-              trivia.answer +
-              "'"
-          );
+          message.reply(GOOD_TRY_JEFF + trivia.answer + "'");
         }, 5000);
       } else {
-        message.reply(
-          "You tried your best and that's what really counts. The answer was '" +
-            trivia.answer +
-            "'"
-        );
+        message.reply(GOOD_TRY + trivia.answer + "'");
       }
+      resetTrivia();
     }
-    if (similarity("Please Help", message.content) >= 0.8 && triviaCalled) {
+    if (similarity("Help Please", message.content) >= 0.8 && triviaCalled) {
+      console.log(trivia.difficulty);
       if (
-        trivia.choices &&
-        ("hard" === trivia.difficulty || "medium" === trivia.difficulty)
+        (trivia.choices && DIFFICULTY.HARD === trivia.difficulty) ||
+        DIFFICULTY.MEDIUM === trivia.difficulty
       ) {
-        message.reply(
-          "Fine, I'll make it a bit easier. How about multiple choice?" +
-            "\nA: " +
-            trivia.choices[0] +
-            "\nB: " +
-            trivia.choices[1] +
-            "\nC: " +
-            trivia.choices[2] +
-            "\nD: " +
-            trivia.answer
-        );
+        message.reply(displayMultipleChoice());
       } else {
-        message.reply(
-          "https://tenor.com/view/hal9000-hal-2001-a-space-odyssey-2001a-space-odyssey-gif-21408319"
-        );
+        message.reply(HAL_9000_GIF);
+        message.reply("Really? this should be easy!!!");
       }
     }
   }
 });
+
+const resetTrivia = () => {
+  console.log("resetting trivia");
+  trivia = {};
+  triviaCalled = false;
+};
+
+const displayMultipleChoice = () => {
+  trivia.choices.push(trivia.answer);
+  trivia.choices.sort();
+  return (
+    MULTIPLE_CHOICE +
+    codeBlock(
+      "\nA: " +
+        trivia.choices[0] +
+        "\nB: " +
+        trivia.choices[1] +
+        "\nC: " +
+        trivia.choices[2] +
+        "\nD: " +
+        trivia.choices[3]
+    )
+  );
+};
