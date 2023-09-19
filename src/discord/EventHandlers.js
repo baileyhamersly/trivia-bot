@@ -1,7 +1,7 @@
 //discord client event handling
 const { discordClient } = require("./ClientConfig");
 const { getTrivia } = require("../trivia/TriviaApi");
-const { similarity } = require("../util/Utils");
+const { similarity, percentOdds } = require("../util/Utils");
 const { codeBlock } = require("discord.js");
 const {
   ANSWER_PLEASE,
@@ -12,6 +12,7 @@ const {
 } = require("../util/Constants");
 
 let trivia = {};
+let triviaCalled = false;
 
 discordClient.on("ready", (c) => {
   console.log(`${c.user.username} is online`);
@@ -34,6 +35,7 @@ discordClient.on("messageCreate", async (message) => {
         trivia.question = triviaData.question;
         trivia.choices = triviaData.choices;
         trivia.difficulty = triviaData.difficulty;
+        triviaCalled = true;
       } else {
         message.reply(
           "Something has gone wrong with the connection with the trivia API. :( Tell Bailey to get off Baldur's Gate and fix it."
@@ -49,14 +51,28 @@ discordClient.on("messageCreate", async (message) => {
       console.log("resetting trivia");
       trivia = {};
     }
-    if (similarity(message.content, "Answer Please") >= 0.8) {
-      message.reply(
-        "You tried your best and that's what really counts. The answer was '" +
-          trivia.answer +
-          "'"
-      );
+    if (similarity(message.content, "Answer Please") >= 0.8 && triviaCalled) {
+      // make this part of the const file.
+      const jeffReply =
+        "https://tenor.com/view/paul-rudd-knockedup-gay-coldplay-insult-gif-12701756";
+      if (message.author.globalName === "Jeff SPR" && percentOdds(25)) {
+        message.reply(jeffReply);
+        setTimeout(function () {
+          message.reply(
+            "HAHA Just kidding Jeff!!! You tried your best and that's what really counts. The answer was '" +
+              trivia.answer +
+              "'"
+          );
+        }, 5000);
+      } else {
+        message.reply(
+          "You tried your best and that's what really counts. The answer was '" +
+            trivia.answer +
+            "'"
+        );
+      }
     }
-    if (similarity("Please Help", message.content) >= 0.8) {
+    if (similarity("Please Help", message.content) >= 0.8 && triviaCalled) {
       if (
         trivia.choices &&
         ("hard" === trivia.difficulty || "medium" === trivia.difficulty)
