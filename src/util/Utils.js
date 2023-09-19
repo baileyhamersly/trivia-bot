@@ -17,6 +17,14 @@ exports.similarity = (s1, s2) => {
   }
 };
 
+exports.percentOdds = (percentChance) => {
+  // Generate a random number between 1 and 100
+  const randomNumber = Math.floor(Math.random() * 100) + 1;
+
+  // Check if the random number is less than or equal to the percent chance
+  return randomNumber <= percentChance;
+};
+
 const editDistance = (s1, s2) => {
   s1 = s1.toLowerCase();
   s2 = s2.toLowerCase();
