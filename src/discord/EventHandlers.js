@@ -31,6 +31,10 @@ discordClient.on("messageCreate", async (message) => {
     try {
       const triviaData = await getTrivia();
       if (triviaData) {
+        trivia.answer = triviaData.answer;
+        trivia.question = triviaData.question;
+        trivia.choices = triviaData.choices;
+        trivia.difficulty = triviaData.difficulty;
         if (triviaData.question.includes(WHICH_OF_THESE)) {
           message.reply(
             triviaData.question +
@@ -41,10 +45,6 @@ discordClient.on("messageCreate", async (message) => {
         } else {
           message.reply(triviaData.question + "\n" + codeBlock(ANSWER_PLEASE));
         }
-        trivia.answer = triviaData.answer;
-        trivia.question = triviaData.question;
-        trivia.choices = triviaData.choices;
-        trivia.difficulty = triviaData.difficulty;
         triviaCalled = true;
       } else {
         message.reply(SOMETHING_WENT_WRONG);
