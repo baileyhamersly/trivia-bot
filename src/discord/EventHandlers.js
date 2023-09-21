@@ -75,7 +75,7 @@ discordClient.on("messageCreate", async (message) => {
         (trivia.choices && DIFFICULTY.HARD === trivia.difficulty) ||
         DIFFICULTY.MEDIUM === trivia.difficulty
       ) {
-        message.reply(displayMultipleChoice());
+        message.reply(MULTIPLE_CHOICE + displayMultipleChoice());
       } else {
         message.reply(HAL_9000_GIF);
         message.reply("Really? this should be easy!!!");
@@ -93,17 +93,14 @@ const resetTrivia = () => {
 const displayMultipleChoice = () => {
   trivia.choices.push(trivia.answer);
   trivia.choices.sort();
-  return (
-    MULTIPLE_CHOICE +
-    codeBlock(
-      "\nA: " +
-        trivia.choices[0] +
-        "\nB: " +
-        trivia.choices[1] +
-        "\nC: " +
-        trivia.choices[2] +
-        "\nD: " +
-        trivia.choices[3]
-    )
+  return codeBlock(
+    "\nA: " +
+      trivia.choices[0] +
+      "\nB: " +
+      trivia.choices[1] +
+      "\nC: " +
+      trivia.choices[2] +
+      "\nD: " +
+      trivia.choices[3]
   );
 };
