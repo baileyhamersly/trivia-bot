@@ -3,6 +3,7 @@ const { discordClient } = require("./ClientConfig");
 const { getTrivia } = require("../trivia/TriviaApi");
 const { similarity, percentOdds } = require("../util/Utils");
 const { codeBlock } = require("discord.js");
+const { generate } = require("../teamname/TeamNameGenerator");
 const {
   ANSWER_PLEASE,
   SOMETHING_WENT_WRONG,
@@ -55,6 +56,9 @@ discordClient.on("messageCreate", async (message) => {
       console.error(ERROR_FETCHING_DATA, error);
       message.reply(ERROR_FETCHING_DATA);
     }
+  } else if (similarity("Team Name Please", message.content) >= 0.8) {
+    var teamNames = generate();
+    message.reply("How about these?" + teamNames);
   } else {
     if (similarity(message.content, trivia.answer) >= 0.8) {
       message.reply(CORRECT + trivia.answer + "'");
