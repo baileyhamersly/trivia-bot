@@ -35,6 +35,8 @@ discordClient.on("messageCreate", async (message) => {
         trivia.question = triviaData.question;
         trivia.choices = triviaData.choices;
         trivia.difficulty = triviaData.difficulty;
+        trivia.choices.push(trivia.answer);
+        trivia.choices.sort();
         if (triviaData.question.includes(WHICH_OF_THESE)) {
           message.reply(
             triviaData.question +
@@ -91,8 +93,6 @@ const resetTrivia = () => {
 };
 
 const displayMultipleChoice = () => {
-  trivia.choices.push(trivia.answer);
-  trivia.choices.sort();
   return codeBlock(
     "\nA: " +
       trivia.choices[0] +
