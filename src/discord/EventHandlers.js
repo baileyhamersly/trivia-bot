@@ -4,7 +4,8 @@ const { getTrivia } = require("../trivia/TriviaApi");
 const { similarity, percentOdds } = require("../util/Utils");
 const { codeBlock } = require("discord.js");
 const {
-  ANSWER_PLEASE,
+  ANSWER_HELP_INFO,
+  NEW_QUESTION_INFO,
   SOMETHING_WENT_WRONG,
   ERROR_FETCHING_DATA,
   CORRECT,
@@ -27,7 +28,11 @@ discordClient.on("ready", (c) => {
 });
 
 discordClient.on("messageCreate", async (message) => {
-  if (similarity("Trivia Please", message.content) >= 0.8) {
+  const userMessageLower = message?.content?.toLowerCase();
+  if (
+    similarity("trivia please", userMessageLower) >= 0.8 ||
+    userMessageLower === "tp"
+  ) {
     try {
       const triviaData = await getTrivia();
       if (triviaData) {
@@ -42,10 +47,12 @@ discordClient.on("messageCreate", async (message) => {
             triviaData.question +
               "\n" +
               displayMultipleChoice() +
-              codeBlock(ANSWER_PLEASE)
+              codeBlock(ANSWER_HELP_INFO)
           );
         } else {
-          message.reply(triviaData.question + "\n" + codeBlock(ANSWER_PLEASE));
+          message.reply(
+            triviaData.question + "\n" + codeBlock(ANSWER_HELP_INFO)
+          );
         }
         triviaCalled = true;
       } else {
@@ -56,11 +63,21 @@ discordClient.on("messageCreate", async (message) => {
       message.reply(ERROR_FETCHING_DATA);
     }
   } else {
-    if (similarity(message.content, trivia.answer) >= 0.8) {
-      message.reply(CORRECT + trivia.answer + "'");
+    let answerLower = trivia?.answer?.toLowerCase();
+    if (
+      similarity(userMessageLower, answerLower) >= 0.8 ||
+      (userMessageLower.length > 4 && answerLower?.includes(userMessageLower))
+    ) {
+      message.reply(
+        CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO)
+      );
       resetTrivia();
     }
-    if (similarity(message.content, "Answer Please") >= 0.8 && triviaCalled) {
+    if (
+      (similarity(userMessageLower, "answer please") >= 0.8 ||
+        userMessageLower === "ap") &&
+      triviaCalled
+    ) {
       if (message.author.globalName === JEFF && percentOdds(25)) {
         message.reply(PAUL_RUDD_GIF);
         setTimeout(function () {
@@ -71,7 +88,11 @@ discordClient.on("messageCreate", async (message) => {
       }
       resetTrivia();
     }
-    if (similarity("Help Please", message.content) >= 0.8 && triviaCalled) {
+    if (
+      (similarity("help please", userMessageLower) >= 0.8 ||
+        userMessageLower === "hp") &&
+      triviaCalled
+    ) {
       console.log(trivia.difficulty);
       if (
         (trivia.choices && DIFFICULTY.HARD === trivia.difficulty) ||

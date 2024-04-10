@@ -5,8 +5,9 @@ exports.DIFFICULTY = {
   MEDIUM: "medium",
   HARD: "hard",
 };
-exports.ANSWER_PLEASE =
-  "To get the answer, say 'Answer Please', to get a new question say 'Trivia Please'";
+exports.ANSWER_HELP_INFO =
+  "To get the answer, say 'Answer Please' or 'ap', for a hint say 'Help Please' or 'hp'";
+exports.NEW_QUESTION_INFO = "To get a new question say 'Trivia Please' or 'tp'";
 exports.SOMETHING_WENT_WRONG =
   "Something has gone wrong with the connection to the trivia API. :( Tell Bailey to get off Baldur's Gate and fix it.";
 exports.ERROR_FETCHING_DATA = "An error occurred while fetching trivia data.";
