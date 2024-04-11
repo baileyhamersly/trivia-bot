@@ -1,6 +1,6 @@
 <!-- PROJECT LOGO -->
 <br />
-<div align="center">
+<div align="center" id="#readme-top">
     <img src="assets/chamber-bot.jpeg" alt="Logo" width="80" height="80">
 
   <h3 align="center">Discord Trivia Bot</h3>
