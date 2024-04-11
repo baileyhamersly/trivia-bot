@@ -69,10 +69,7 @@ Process should be running in background and you should be able to close session
 
 <!-- CONTACT -->
 ## Contact
-
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
-
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+[LinkedIn](https://www.linkedin.com/in/bailey-hamersly-17b711b0/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
