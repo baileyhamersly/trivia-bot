@@ -86,11 +86,25 @@ This is an example of how to list things you need to use the software and how to
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
+## How To Make Code Updates
+1. Make changes to code locally.
+2. Open WinSCP and connect to Hostinger VPS Connection
+3. Navigate to /usr/local/lsws/trivia-bot
+4. Upload new code to appropriate folders
+5. NPM Install to make sure node is up-to-date
+6. Open Terminal, use SSH pass in 1Password to log into root user
+7. Navigate to trivia-bot folder in terminal
+8. Use PM2 to check, stop or start processes:
+    - pm2 list - checks running processes
+    - pm2 stop - stop running processes
+    - pm2 start index.js - run index.js
+Process should be running in background and you should be able to close session
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+## OpenLiteSpeed Admin Access 
+1. On Hostinger, Navigate to VPS tab
+2. Click Manage button
+3. Take IP from top of VPS information table and navigate to https://IP:7080
+4. Admin Credentials in 1Password as CyberPanel Login
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
