@@ -73,7 +73,7 @@ discordClient.on('messageCreate', async (message) => {
       resetTrivia();
     }
     if ((similarity('help please', userMessageLower) >= 0.8 || userMessageLower === 'hp') && triviaCalled) {
-      console.log(trivia.difficulty);
+      console.log('Question difficulty level is: ', trivia.difficulty);
       if ((trivia.choices && DIFFICULTY.HARD === trivia.difficulty) || DIFFICULTY.MEDIUM === trivia.difficulty) {
         message.reply(MULTIPLE_CHOICE + displayMultipleChoice());
       } else {
