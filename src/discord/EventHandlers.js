@@ -1,8 +1,8 @@
 //discord client event handling
-const { discordClient } = require("./ClientConfig");
-const { getTrivia } = require("../trivia/TriviaApi");
-const { similarity, percentOdds } = require("../util/Utils");
-const { codeBlock } = require("discord.js");
+const { discordClient } = require('./ClientConfig');
+const { getTrivia } = require('../trivia/TriviaApi');
+const { similarity, percentOdds } = require('../util/Utils');
+const { codeBlock } = require('discord.js');
 const {
   ANSWER_HELP_INFO,
   NEW_QUESTION_INFO,
@@ -17,22 +17,19 @@ const {
   MULTIPLE_CHOICE,
   DIFFICULTY,
   WHICH_OF_THESE,
-} = require("../util/Constants");
+} = require('../util/Constants');
 
 let trivia = {};
 let triviaCalled = false;
 
-discordClient.on("ready", (c) => {
+discordClient.on('ready', (c) => {
   console.log(`${c.user.username} is online`);
   getTrivia();
 });
 
-discordClient.on("messageCreate", async (message) => {
+discordClient.on('messageCreate', async (message) => {
   const userMessageLower = message?.content?.toLowerCase();
-  if (
-    similarity("trivia please", userMessageLower) >= 0.8 ||
-    userMessageLower === "tp"
-  ) {
+  if (similarity('trivia please', userMessageLower) >= 0.8 || userMessageLower === 'tp') {
     try {
       const triviaData = await getTrivia();
       if (triviaData) {
@@ -43,16 +40,9 @@ discordClient.on("messageCreate", async (message) => {
         trivia.choices.push(trivia.answer);
         trivia.choices.sort();
         if (triviaData.question.includes(WHICH_OF_THESE)) {
-          message.reply(
-            triviaData.question +
-              "\n" +
-              displayMultipleChoice() +
-              codeBlock(ANSWER_HELP_INFO)
-          );
+          message.reply(triviaData.question + '\n' + displayMultipleChoice() + codeBlock(ANSWER_HELP_INFO));
         } else {
-          message.reply(
-            triviaData.question + "\n" + codeBlock(ANSWER_HELP_INFO)
-          );
+          message.reply(triviaData.question + '\n' + codeBlock(ANSWER_HELP_INFO));
         }
         triviaCalled = true;
       } else {
@@ -68,16 +58,10 @@ discordClient.on("messageCreate", async (message) => {
       similarity(userMessageLower, answerLower) >= 0.8 ||
       (userMessageLower.length > 4 && answerLower?.includes(userMessageLower))
     ) {
-      message.reply(
-        CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO)
-      );
+      message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
       resetTrivia();
     }
-    if (
-      (similarity(userMessageLower, "answer please") >= 0.8 ||
-        userMessageLower === "ap") &&
-      triviaCalled
-    ) {
+    if ((similarity(userMessageLower, 'answer please') >= 0.8 || userMessageLower === 'ap') && triviaCalled) {
       if (message.author.globalName === JEFF && percentOdds(25)) {
         message.reply(PAUL_RUDD_GIF);
         setTimeout(function () {
@@ -88,40 +72,33 @@ discordClient.on("messageCreate", async (message) => {
       }
       resetTrivia();
     }
-    if (
-      (similarity("help please", userMessageLower) >= 0.8 ||
-        userMessageLower === "hp") &&
-      triviaCalled
-    ) {
+    if ((similarity('help please', userMessageLower) >= 0.8 || userMessageLower === 'hp') && triviaCalled) {
       console.log(trivia.difficulty);
-      if (
-        (trivia.choices && DIFFICULTY.HARD === trivia.difficulty) ||
-        DIFFICULTY.MEDIUM === trivia.difficulty
-      ) {
+      if ((trivia.choices && DIFFICULTY.HARD === trivia.difficulty) || DIFFICULTY.MEDIUM === trivia.difficulty) {
         message.reply(MULTIPLE_CHOICE + displayMultipleChoice());
       } else {
         message.reply(HAL_9000_GIF);
-        message.reply("Really? this should be easy!!!");
+        message.reply('Really? this should be easy!!!');
       }
     }
   }
 });
 
 const resetTrivia = () => {
-  console.log("resetting trivia");
+  console.log('resetting trivia');
   trivia = {};
   triviaCalled = false;
 };
 
 const displayMultipleChoice = () => {
   return codeBlock(
-    "\nA: " +
+    '\nA: ' +
       trivia.choices[0] +
-      "\nB: " +
+      '\nB: ' +
       trivia.choices[1] +
-      "\nC: " +
+      '\nC: ' +
       trivia.choices[2] +
-      "\nD: " +
+      '\nD: ' +
       trivia.choices[3]
   );
 };

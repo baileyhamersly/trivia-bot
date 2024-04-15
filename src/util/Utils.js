@@ -11,9 +11,7 @@ exports.similarity = (s1, s2) => {
     if (longerLength == 0) {
       return 1.0;
     }
-    return (
-      (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength)
-    );
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
   }
 };
 
@@ -37,8 +35,7 @@ const editDistance = (s1, s2) => {
       else {
         if (j > 0) {
           var newValue = costs[j - 1];
-          if (s1.charAt(i - 1) != s2.charAt(j - 1))
-            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+          if (s1.charAt(i - 1) != s2.charAt(j - 1)) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
           costs[j - 1] = lastValue;
           lastValue = newValue;
         }
