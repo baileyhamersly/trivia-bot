@@ -10,6 +10,6 @@ exports.getTrivia = async () => {
       difficulty: data[0].difficulty,
     };
   } else {
-    throw new Error("Trivia data not available.");
+    throw new Error('Trivia data not available.');
   }
 };
