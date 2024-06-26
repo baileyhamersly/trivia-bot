@@ -21,6 +21,7 @@ const {
 
 let trivia = {};
 let triviaCalled = false;
+let multiChoiceOptions = [];
 
 discordClient.on('ready', (c) => {
   console.log(`${c.user.username} is online`);
@@ -54,6 +55,18 @@ discordClient.on('messageCreate', async (message) => {
     }
   } else {
     let answerLower = trivia?.answer?.toLowerCase();
+    if (multiChoiceOptions?.length > 0) {
+      let answerChoice = "";
+      for (let choice of multiChoiceOptions) {
+        if (choice.answer === trivia?.answer) {
+          answerChoice = choice.letter
+        }
+      }
+      if (userMessageLower === answerChoice) {
+        message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
+        resetTrivia();
+      }
+    }
     if (
       similarity(userMessageLower, answerLower) >= 0.8 ||
       (userMessageLower.length > 4 && answerLower?.includes(userMessageLower))
@@ -88,9 +101,12 @@ const resetTrivia = () => {
   console.log('resetting trivia');
   trivia = {};
   triviaCalled = false;
+  multiChoiceOptions = [];
 };
 
 const displayMultipleChoice = () => {
+  multiChoiceFlag = true;
+  multiChoiceOptions = [{letter: "a", answer: trivia.choices[0]}, {letter: "b", answer: trivia.choices[1]}, {letter: "c", answer: trivia.choices[2]}, {letter: "d", answer: trivia.choices[3]}];
   return codeBlock(
     '\nA: ' +
       trivia.choices[0] +
