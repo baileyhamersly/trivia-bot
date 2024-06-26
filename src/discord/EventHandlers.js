@@ -30,6 +30,7 @@ discordClient.on('ready', (c) => {
 
 discordClient.on('messageCreate', async (message) => {
   const userMessageLower = message?.content?.toLowerCase();
+  //Handling Trivia request
   if (similarity('trivia please', userMessageLower) >= 0.8 || userMessageLower === 'tp') {
     try {
       const triviaData = await getTrivia();
@@ -55,6 +56,7 @@ discordClient.on('messageCreate', async (message) => {
     }
   } else {
     let answerLower = trivia?.answer?.toLowerCase();
+    //Handling users answering multiple choice with letter of choice
     if (multiChoiceOptions?.length > 0) {
       let answerChoice = "";
       for (let choice of multiChoiceOptions) {
@@ -62,11 +64,17 @@ discordClient.on('messageCreate', async (message) => {
           answerChoice = choice.letter
         }
       }
+      if (userMessageLower === "d" && "d" !== answerChoice) {
+        if (percentOdds(25)) {
+        message.reply("D? MORE LIKE DEEZ NUTS (but no, that's not correct)");
+        }
+      }
       if (userMessageLower === answerChoice) {
         message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
         resetTrivia();
       }
     }
+    //Handling users answers typed out
     if (
       similarity(userMessageLower, answerLower) >= 0.8 ||
       (userMessageLower.length > 4 && answerLower?.includes(userMessageLower))
@@ -74,6 +82,7 @@ discordClient.on('messageCreate', async (message) => {
       message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
       resetTrivia();
     }
+    //Handling Answer request
     if ((similarity(userMessageLower, 'answer please') >= 0.8 || userMessageLower === 'ap') && triviaCalled) {
       if (message.author.globalName === JEFF && percentOdds(25)) {
         message.reply(PAUL_RUDD_GIF);
@@ -85,6 +94,7 @@ discordClient.on('messageCreate', async (message) => {
       }
       resetTrivia();
     }
+    //Handling Help request
     if ((similarity('help please', userMessageLower) >= 0.8 || userMessageLower === 'hp') && triviaCalled) {
       console.log('Question difficulty level is: ', trivia.difficulty);
       if ((trivia.choices && DIFFICULTY.HARD === trivia.difficulty) || DIFFICULTY.MEDIUM === trivia.difficulty) {
