@@ -55,7 +55,7 @@ A basic discord bot for trivia questions. Simple, straightforward, and with a fe
 8. Use PM2 to check, stop or start processes:
     - pm2 list - checks running processes
     - pm2 stop - stop running processes
-    - pm2 start index.js - run index.js
+    - pm2 start trivia-bot.js - run trivia-bot.js
 Process should be running in background and you should be able to close session
 
 ## OpenLiteSpeed Admin Access 
