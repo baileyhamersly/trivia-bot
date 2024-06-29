@@ -1,4 +1,4 @@
-const { discordClient, discordToken } = require('./discord/ClientConfig');
-require('./discord/EventHandlers');
+const { discordClient, discordToken } = require('./src/discord/ClientConfig');
+require('./src/discord/EventHandlers');
 
 discordClient.login(discordToken);
