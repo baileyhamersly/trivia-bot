@@ -2,6 +2,7 @@
 const { discordClient } = require('./ClientConfig');
 const { getTrivia } = require('../trivia/TriviaApi');
 const { similarity, percentOdds } = require('../util/Utils');
+const { connectDB, getPoints, getUserFromDB, addUserToDB, awardPoint } = require('../repository/Postgres');
 const { codeBlock } = require('discord.js');
 const {
   ANSWER_HELP_INFO,
@@ -17,11 +18,19 @@ const {
   MULTIPLE_CHOICE,
   DIFFICULTY,
   WHICH_OF_THESE,
+  POINT_AWARDED,
+  REQUEST_POINTS,
+  DEEZ_NUTS,
 } = require('../util/Constants');
 
 let trivia = {};
 let triviaCalled = false;
+let askedForHelp = false;
 let multiChoiceOptions = [];
+let activeUsers = []; //TODO: track active users to decrease db calls.
+
+// Connect to the database
+connectDB();
 
 discordClient.on('ready', (c) => {
   console.log(`${c.user.username} is online`);
@@ -30,6 +39,12 @@ discordClient.on('ready', (c) => {
 
 discordClient.on('messageCreate', async (message) => {
   const userMessageLower = message?.content?.toLowerCase();
+
+  const existingUserData = await getUserFromDB(message.author.id);
+  if (existingUserData.length === 0 && message.author.username != 'trivia-bot') {
+    console.log('Adding new user to DB...', message.author.username);
+    addUserToDB(message.author);
+  }
   //Handling Trivia request
   if (similarity('trivia please', userMessageLower) >= 0.8 || userMessageLower === 'tp') {
     try {
@@ -58,19 +73,25 @@ discordClient.on('messageCreate', async (message) => {
     let answerLower = trivia?.answer?.toLowerCase();
     //Handling users answering multiple choice with letter of choice
     if (multiChoiceOptions?.length > 0) {
-      let answerChoice = "";
+      let answerChoice = '';
       for (let choice of multiChoiceOptions) {
         if (choice.answer === trivia?.answer) {
-          answerChoice = choice.letter
+          answerChoice = choice.letter;
         }
       }
-      if (userMessageLower === "d" && "d" !== answerChoice) {
+      if (userMessageLower === 'd' && 'd' !== answerChoice) {
         if (percentOdds(25)) {
-        message.reply("D? MORE LIKE DEEZ NUTS (but no, that's not correct)");
+          message.reply(DEEZ_NUTS);
         }
       }
       if (userMessageLower === answerChoice) {
-        message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
+        if (!askedForHelp) {
+          //award point to the user.
+          const newPoints = await awardPoint(message.author.id);
+          message.reply(CORRECT + trivia.answer + "'\n" + POINT_AWARDED + newPoints + codeBlock(NEW_QUESTION_INFO));
+        } else {
+          message.reply(CORRECT + trivia.answer + "' " + codeBlock(NEW_QUESTION_INFO));
+        }
         resetTrivia();
       }
     }
@@ -79,7 +100,13 @@ discordClient.on('messageCreate', async (message) => {
       similarity(userMessageLower, answerLower) >= 0.8 ||
       (userMessageLower.length > 4 && answerLower?.includes(userMessageLower))
     ) {
-      message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
+      if (!askedForHelp) {
+        //award point to the user.
+        const newPoints = await awardPoint(message.author.id);
+        message.reply(CORRECT + trivia.answer + "'\n" + POINT_AWARDED + newPoints + codeBlock(NEW_QUESTION_INFO));
+      } else {
+        message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
+      }
       resetTrivia();
     }
     //Handling Answer request
@@ -98,11 +125,21 @@ discordClient.on('messageCreate', async (message) => {
     if ((similarity('help please', userMessageLower) >= 0.8 || userMessageLower === 'hp') && triviaCalled) {
       console.log('Question difficulty level is: ', trivia.difficulty);
       if ((trivia.choices && DIFFICULTY.HARD === trivia.difficulty) || DIFFICULTY.MEDIUM === trivia.difficulty) {
+        askedForHelp = true;
         message.reply(MULTIPLE_CHOICE + displayMultipleChoice());
       } else {
         message.reply(HAL_9000_GIF);
         message.reply('Really? this should be easy!!!');
       }
+    }
+    //Handling Points request
+    if (similarity('points please', userMessageLower) >= 0.8 || userMessageLower === 'pp') {
+      const response = await getPoints();
+      let pointsTotals = '';
+      response.forEach((user) => {
+        pointsTotals += `${user.username}: ${user.points}\n`;
+      });
+      message.reply('Here are the current points totals:\n' + codeBlock(pointsTotals));
     }
   }
 });
@@ -111,12 +148,18 @@ const resetTrivia = () => {
   console.log('resetting trivia');
   trivia = {};
   triviaCalled = false;
+  askedForHelp = false;
   multiChoiceOptions = [];
 };
 
 const displayMultipleChoice = () => {
   multiChoiceFlag = true;
-  multiChoiceOptions = [{letter: "a", answer: trivia.choices[0]}, {letter: "b", answer: trivia.choices[1]}, {letter: "c", answer: trivia.choices[2]}, {letter: "d", answer: trivia.choices[3]}];
+  multiChoiceOptions = [
+    { letter: 'a', answer: trivia.choices[0] },
+    { letter: 'b', answer: trivia.choices[1] },
+    { letter: 'c', answer: trivia.choices[2] },
+    { letter: 'd', answer: trivia.choices[3] },
+  ];
   return codeBlock(
     '\nA: ' +
       trivia.choices[0] +

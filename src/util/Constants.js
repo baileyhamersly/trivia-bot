@@ -5,8 +5,10 @@ exports.DIFFICULTY = {
   MEDIUM: 'medium',
   HARD: 'hard',
 };
-exports.ANSWER_HELP_INFO = "To get the answer, say 'Answer Please' or 'ap', for a hint say 'Help Please' or 'hp'";
-exports.NEW_QUESTION_INFO = "To get a new question say 'Trivia Please' or 'tp'";
+exports.ANSWER_HELP_INFO =
+  "To get the answer, say 'Answer Please' or 'ap', for a hint say 'Help Please' or 'hp'. Remember, if you ask for help you can't earn points.";
+exports.NEW_QUESTION_INFO =
+  "To get a new question say 'Trivia Please' or 'tp'. To see the points totals say 'Points Please' or 'pp'.";
 exports.SOMETHING_WENT_WRONG =
   "Something has gone wrong with the connection to the trivia API. :( Tell Bailey to get off Baldur's Gate and fix it.";
 exports.ERROR_FETCHING_DATA = 'An error occurred while fetching trivia data.';
@@ -18,3 +20,5 @@ exports.GOOD_TRY_JEFF = "HAHA Just kidding Jeff!!! You tried your best and that'
 exports.JEFF = 'Jeff SPR';
 exports.MULTIPLE_CHOICE = "Fine, I'll make it a bit easier. How about multiple choice?";
 exports.WHICH_OF_THESE = 'Which of these';
+exports.DEEZ_NUTS = "D? MORE LIKE DEEZ NUTS (but no, that's not correct)";
+exports.POINT_AWARDED = "You've been awarded 1 point! \nYour total points are: ";
