@@ -31,18 +31,74 @@ async function disconnectDB() {
   }
 }
 
-// Example query function
-async function queryData() {
+async function getPoints() {
   try {
-    const query = 'SELECT * FROM players';
-    const result = await pgClient.query(query);
-    console.log('Query results:');
-    console.table(result.rows);
+    const query = 'SELECT * FROM trivia.users';
+    const response = await pgClient.query(query);
+    const parsedRows = response.rows.map((row) => {
+      // Ensure score is parsed as a number if needed
+      const points = parseInt(row.points); // or parseFloat() for decimal values
+      // Construct and return parsed row object
+      return {
+        id: row.id,
+        username: row.username,
+        points: points ? points : 0,
+      };
+    });
+    return parsedRows;
+    // Return the query results (array of objects)
   } catch (error) {
-    console.error('Error executing query:', error);
-  } finally {
-    // Disconnect from the database
-    //disconnectDB();
+    console.error('Error executing SQL query:', error);
+  }
+}
+
+async function getUserFromDB(id) {
+  try {
+    const query = 'SELECT * FROM trivia.users WHERE id = ' + id;
+    const response = await pgClient.query(query);
+    const parsedRows = response.rows.map((row) => {
+      // Ensure score is parsed as a number if needed
+      const points = parseInt(row.points); // or parseFloat() for decimal values
+      // Construct and return parsed row object
+      return {
+        id: row.id,
+        name: row.username,
+        globalName: row.global_name,
+        points: points,
+      };
+    });
+    return parsedRows;
+    // Return the query results (array of objects)
+  } catch (error) {
+    console.error('Error executing SQL query:', error);
+  }
+}
+
+async function addUserToDB(author) {
+  const query = 'INSERT INTO trivia.users (id, username, global_name) VALUES ($1, $2, $3)';
+  const values = [author.id, author.username, author.globalName];
+  pgClient
+    .query(query, values)
+    .then((res) => {
+      console.log('Row inserted:', res.rowCount);
+      console.log('user added: ', author.username);
+    })
+    .catch((e) => console.error('Error executing query', e.stack));
+}
+
+async function awardPoint(id) {
+  try {
+    const query = `UPDATE trivia.users
+        SET points = points + 1
+        WHERE id = $1
+        RETURNING points`;
+    const values = [id];
+
+    const res = await pgClient.query(query, values);
+    const result = res.rows.length > 0 ? res.rows[0].points : 0;
+    return result;
+  } catch (err) {
+    console.error('Error updating user points:', err);
   }
 }
 
@@ -51,4 +107,8 @@ module.exports = {
   pgClient,
   connectDB,
   disconnectDB,
+  getPoints,
+  getUserFromDB,
+  addUserToDB,
+  awardPoint,
 };
