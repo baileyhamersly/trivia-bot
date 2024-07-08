@@ -27,7 +27,7 @@ let trivia = {};
 let triviaCalled = false;
 let askedForHelp = false;
 let multiChoiceOptions = [];
-let activeUsers = [];
+let activeUsers = []; //TODO: track active users to decrease db calls.
 
 // Connect to the database
 connectDB();
