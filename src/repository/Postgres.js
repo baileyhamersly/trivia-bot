@@ -33,7 +33,7 @@ async function disconnectDB() {
 
 async function getPoints() {
   try {
-    const query = 'SELECT * FROM trivia.users';
+    const query = 'SELECT * FROM trivia.users ORDER BY points DESC';
     const response = await pgClient.query(query);
     const parsedRows = response.rows.map((row) => {
       // Ensure score is parsed as a number if needed
@@ -41,8 +41,29 @@ async function getPoints() {
       // Construct and return parsed row object
       return {
         id: row.id,
-        username: row.username,
+        username: row.global_name,
         points: points ? points : 0,
+      };
+    });
+    return parsedRows;
+    // Return the query results (array of objects)
+  } catch (error) {
+    console.error('Error executing SQL query:', error);
+  }
+}
+
+async function getHighScores() {
+  try {
+    const query = 'SELECT * FROM trivia.users ORDER BY record DESC';
+    const response = await pgClient.query(query);
+    const parsedRows = response.rows.map((row) => {
+      // Ensure score is parsed as a number if needed
+      const record = parseInt(row.record); // or parseFloat() for decimal values
+      // Construct and return parsed row object
+      return {
+        id: row.id,
+        username: row.global_name,
+        record: record ? record : 0,
       };
     });
     return parsedRows;
@@ -79,11 +100,8 @@ async function addUserToDB(author) {
   const values = [author.id, author.username, author.globalName];
   pgClient
     .query(query, values)
-    .then((res) => {
-      console.log('Row inserted:', res.rowCount);
-      console.log('user added: ', author.username);
-    })
-    .catch((e) => console.error('Error executing query', e.stack));
+    .then(console.log('user added: ', author.username))
+    .catch((e) => console.error('Error executing query: ', e.stack));
 }
 
 async function awardPoint(id) {
@@ -98,7 +116,40 @@ async function awardPoint(id) {
     const result = res.rows.length > 0 ? res.rows[0].points : 0;
     return result;
   } catch (err) {
-    console.error('Error updating user points:', err);
+    console.error('Error updating user points: ', err);
+  }
+}
+
+async function updateHighScores() {
+  try {
+    const query = 'UPDATE trivia.users SET record = points WHERE points > record RETURNING record';
+    const res = await pgClient.query(query);
+    const result = res.rows;
+    return result;
+  } catch (err) {
+    console.error('Error updating high scores: ', err);
+  }
+}
+
+async function resetHighScores() {
+  try {
+    const query = 'UPDATE trivia.users SET points = 0';
+    await pgClient.query(query);
+  } catch (err) {
+    console.error('Error resetting scores: ', err);
+  }
+}
+
+async function checkForReset() {
+  const now = new Date();
+  const day = now.getDay();
+  const hours = now.getHours();
+
+  if (day === 1 && hours === 1) {
+    //update database here
+    await updateHighScores();
+    await resetHighScores();
+    console.log('Scores have been reset!');
   }
 }
 
@@ -111,4 +162,7 @@ module.exports = {
   getUserFromDB,
   addUserToDB,
   awardPoint,
+  getHighScores,
 };
+
+setInterval(checkForReset, 3600000);
