@@ -145,8 +145,7 @@ async function checkForReset() {
   const day = now.getDay();
   const hours = now.getHours();
 
-  if (day === 1 && hours === 1) {
-    //update database here
+  if (day === 1 && hours === 0) {
     await updateHighScores();
     await resetHighScores();
     console.log('Scores have been reset!');
