@@ -100,7 +100,7 @@ async function addUserToDB(author) {
   const values = [author.id, author.username, author.globalName];
   pgClient
     .query(query, values)
-    .then(console.log('user added: ', author.username))
+    .then(console.log('user added: ', author.globalName))
     .catch((e) => console.error('Error executing query: ', e.stack));
 }
 
