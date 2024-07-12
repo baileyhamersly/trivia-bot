@@ -2,7 +2,14 @@
 const { discordClient } = require('./ClientConfig');
 const { getTrivia } = require('../trivia/TriviaApi');
 const { similarity, percentOdds } = require('../util/Utils');
-const { connectDB, getPoints, getUserFromDB, addUserToDB, awardPoint } = require('../repository/Postgres');
+const {
+  connectDB,
+  getPoints,
+  getUserFromDB,
+  addUserToDB,
+  awardPoint,
+  getHighScores,
+} = require('../repository/Postgres');
 const { codeBlock } = require('discord.js');
 const {
   ANSWER_HELP_INFO,
@@ -41,8 +48,8 @@ discordClient.on('messageCreate', async (message) => {
   const userMessageLower = message?.content?.toLowerCase();
 
   const existingUserData = await getUserFromDB(message.author.id);
-  if (existingUserData.length === 0 && message.author.username != 'trivia-bot') {
-    console.log('Adding new user to DB...', message.author.username);
+  if (existingUserData.length === 0 && message.author.globalName != null) {
+    console.log('Adding new user to DB...', message.author.globalName);
     addUserToDB(message.author);
   }
   //Handling Trivia request
@@ -140,6 +147,15 @@ discordClient.on('messageCreate', async (message) => {
         pointsTotals += `${user.username}: ${user.points}\n`;
       });
       message.reply('Here are the current points totals:\n' + codeBlock(pointsTotals));
+    }
+    //Handling high score request
+    if (similarity('high score please', userMessageLower) >= 0.8 || userMessageLower === 'hsp') {
+      const response = await getHighScores();
+      let recordTotals = '';
+      response.forEach((user) => {
+        recordTotals += `${user.username}: ${user.record}\n`;
+      });
+      message.reply('High scores:\n' + codeBlock(recordTotals));
     }
   }
 });
