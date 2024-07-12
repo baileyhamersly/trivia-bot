@@ -123,9 +123,7 @@ async function awardPoint(id) {
 async function updateHighScores() {
   try {
     const query = 'UPDATE trivia.users SET record = points WHERE points > record RETURNING record';
-    const res = await pgClient.query(query);
-    const result = res.rows;
-    return result;
+    await pgClient.query(query);
   } catch (err) {
     console.error('Error updating high scores: ', err);
   }
@@ -144,9 +142,9 @@ async function checkForReset() {
   const now = new Date();
   const day = now.getDay();
   const hours = now.getHours();
+  await updateHighScores();
 
   if (day === 1 && hours === 0) {
-    await updateHighScores();
     await resetHighScores();
     console.log('Scores have been reset!');
   }
