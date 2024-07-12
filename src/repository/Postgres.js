@@ -122,14 +122,14 @@ async function awardPoint(id) {
 
 async function updateHighScores() {
   try {
-    const query = 'UPDATE trivia.users SET record = points WHERE points > record RETURNING record';
+    const query = 'UPDATE trivia.users SET record = points WHERE points > record';
     await pgClient.query(query);
   } catch (err) {
     console.error('Error updating high scores: ', err);
   }
 }
 
-async function resetHighScores() {
+async function resetScores() {
   try {
     const query = 'UPDATE trivia.users SET points = 0';
     await pgClient.query(query);
@@ -142,10 +142,10 @@ async function checkForReset() {
   const now = new Date();
   const day = now.getDay();
   const hours = now.getHours();
-  await updateHighScores();
 
   if (day === 1 && hours === 0) {
-    await resetHighScores();
+    await updateHighScores();
+    await resetScores();
     console.log('Scores have been reset!');
   }
 }
@@ -160,6 +160,7 @@ module.exports = {
   addUserToDB,
   awardPoint,
   getHighScores,
+  updateHighScores,
 };
 
 setInterval(checkForReset, 3600000);

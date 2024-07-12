@@ -9,6 +9,7 @@ const {
   addUserToDB,
   awardPoint,
   getHighScores,
+  updateHighScores,
 } = require('../repository/Postgres');
 const { codeBlock } = require('discord.js');
 const {
@@ -95,6 +96,7 @@ discordClient.on('messageCreate', async (message) => {
         if (!askedForHelp) {
           //award point to the user.
           const newPoints = await awardPoint(message.author.id);
+          await updateHighScores();
           message.reply(CORRECT + trivia.answer + "'\n" + POINT_AWARDED + newPoints + codeBlock(NEW_QUESTION_INFO));
         } else {
           message.reply(CORRECT + trivia.answer + "' " + codeBlock(NEW_QUESTION_INFO));
@@ -110,6 +112,7 @@ discordClient.on('messageCreate', async (message) => {
       if (!askedForHelp) {
         //award point to the user.
         const newPoints = await awardPoint(message.author.id);
+        await updateHighScores();
         message.reply(CORRECT + trivia.answer + "'\n" + POINT_AWARDED + newPoints + codeBlock(NEW_QUESTION_INFO));
       } else {
         message.reply(CORRECT + trivia.answer + "'" + codeBlock(NEW_QUESTION_INFO));
