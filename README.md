@@ -50,7 +50,7 @@ A basic discord bot for trivia questions. Simple, straightforward, and with a fe
 3. Navigate to /usr/local/lsws/trivia-bot
 4. Upload new code to appropriate folders
 5. NPM Install to make sure node is up-to-date
-6. Open Terminal, use SSH pass in 1Password to log into root user
+6. Open Terminal, use SSH pass to log into root user
 7. Navigate to trivia-bot folder in terminal
 8. Use PM2 to check, stop or start processes:
     - pm2 list - checks running processes
