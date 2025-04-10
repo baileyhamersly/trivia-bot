@@ -61,8 +61,7 @@ Process should be running in background and you should be able to close session
 ## OpenLiteSpeed Admin Access 
 1. On Hostinger, Navigate to VPS tab
 2. Click Manage button
-3. Take IP from top of VPS information table and navigate to https://IP:7080
-4. Admin Credentials in 1Password as CyberPanel Login
+4. Admin Credentials as CyberPanel Login
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
